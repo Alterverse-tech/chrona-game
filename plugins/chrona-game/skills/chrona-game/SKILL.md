@@ -11,6 +11,12 @@ For upload or continued collaboration, read [the project workflow](references/co
 
 ## Owned initial imports
 
+For games with existing login or multiplayer, read
+[hosted account compatibility](references/hosted-connect.md) before delivery.
+Check the optional integration contract without changing client authorization
+or collaborative editing. Do not silently rewrite login, networking or World
+bindings during upload.
+
 Treat a branch `previewUrl` as branch-scoped evidence, not as the final editable-World link. For an owned initial import where the user asks to upload a game as an editable World (rather than merely requesting a branch preview), preview the source version, then submit, review, and merge that initial version into `main`. Do not publish or launch the World unless the user requests it.
 
 After the merge, return the native editor link in the form `https://SITE/studio/?world=WORLD_ID`. Verify from `status` that `main` is the imported commit, a build exists for it, and `published` is null/false. Report that as a Draft World with Launch available; browser UI verification remains separate. For shared Worlds or a request limited to a branch preview, leave merging to the owner or to an explicit request.

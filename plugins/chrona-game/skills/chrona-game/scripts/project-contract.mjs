@@ -29,6 +29,7 @@ export function validateProject(project) {
   for(const path of paths){const parts=path.split('/');while(parts.length>1){parts.pop();if(paths.has(parts.join('/')))throw new Error('File/directory collision: '+path)}}
   if(sourceBytes>PROJECT_LIMITS.sourceBytes||assetBytes>PROJECT_LIMITS.assetBytes)throw new Error('Project size limit exceeded')
   if(!['static','v1'].includes(project.delivery?.mode))throw new Error('Choose static or v1 delivery')
+  if(project.delivery.integration!==undefined && (project.delivery.mode!=='static'||project.delivery.integration!=='chrona.host/v1'))throw new Error('Unsupported hosted integration; use chrona.host/v1 with a compatible platform')
   const entry=project.delivery.entry||'index.html'
   if(!projectPath(entry)||!entry.endsWith('.html'))throw new Error('Invalid HTML entry')
   if(project.delivery.connectOrigins!==undefined&&(!Array.isArray(project.delivery.connectOrigins)||project.delivery.connectOrigins.length>20||project.delivery.connectOrigins.some(origin=>{try{const u=new URL(origin);return !['https:','wss:'].includes(u.protocol)||u.origin!==origin||!!u.username||!!u.password}catch{return true}})))throw new Error('Provide exact HTTPS or WSS connection origins')
