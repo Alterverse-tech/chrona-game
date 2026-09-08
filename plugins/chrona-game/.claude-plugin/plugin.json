@@ -1,7 +1,7 @@
 {
   "name": "chrona-game",
-  "version": "0.1.0",
-  "description": "Deliver browser games from Codex or Claude Code to Chrona as owned, editable Worlds.",
+  "version": "0.2.0",
+  "description": "Deliver complete browser game projects and collaborate on Chrona Worlds from Codex or Claude Code.",
   "author": {
     "name": "Chrona"
   },

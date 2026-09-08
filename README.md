@@ -22,16 +22,19 @@ The installation flow follows [Chrona 3D Assets](https://github.com/Alterverse-t
 
 ## What it does
 
-| Stage | What happens |
-| --- | --- |
-| Create | The coding agent develops the game using your prompt, chosen tools, and normal workflow. The bundled starter is optional. |
-| Integrate | Prepare a separate delivery copy, connect the Chrona SDK and editable scene/gameplay entry points, and check the package. |
-| Import | Sign in to your Chrona site and import the package as an owned, private World with a draft preview. |
-| Continue | Use the World's members, development settings, Agent, source revisions, drafts, and release controls. |
+Create the game normally, then deliver the complete editable project and its original build. Each member checks out an independent branch in Codex or Claude Code. Chrona tracks immutable commits, content-addressed assets, independent previews, conflicts, review, merge, release and restoration.
 
-You can also ask to upload an existing game or update an existing World. Updates retain the package ID and World history.
+Uploading creates a development branch. Merging advances main; releasing changes the live game. Public discovery remains a separate setting. The owner uses Chrona's ordinary member roles to invite collaborators.
 
-**Uploading creates a draft.** Launching or releasing an update requires a release request; public access is a separate setting.
+## Build together with one prompt
+
+1. A uploads the game, previews it and merges the initial version into main.
+2. B and C sign in to the same Chrona site. A adds their emails as **Full Developer** members.
+3. B tells Claude Code: `Continue developing this World: WORLD_LINK. Add a harbor, preview it and submit the changes.`
+4. C tells Codex: `Continue developing this World: WORLD_LINK. Add driving gameplay, preview it and submit the changes.`
+5. Each person approves their own first client connection. The agents use separate branches. A reviews, merges and releases the result.
+
+World links select the site and project automatically. Conflicts require explicit resolution and a new preview before approval. A member's branch does not change the live game until release. Both clients need plugin **0.2.0 or newer** and the target server needs the collaboration API.
 
 ## Manual installation
 
@@ -67,51 +70,65 @@ Start a new task or session after installation so the client discovers the Skill
 
 ## Requirements
 
-- A Codex or Claude Code version that supports plugin marketplaces.
-- Node.js 20 or newer for the packaging CLI.
-- A Chrona deployment with the `chrona.game/v1` importer and your normal web sign-in.
-- Authorized browser access for the agent to complete the upload. Without it, the agent provides the package and the remaining manual upload step.
+- A Codex or Claude Code client with plugin marketplace support.
+- Node.js 20+ and a Chrona deployment with the collaboration API.
+- The user's normal Chrona browser account to approve a World-scoped client connection.
 
-This plugin has no MCP server, background hooks, or installation-time authentication. Packaging does not require the Chrona platform repository or an additional model API key. Upload uses your Chrona browser session.
+The plugin has no MCP server, background hooks, model proxy, or installation-time login. The game uses its original engine, dependencies and build tools. Credentials stay outside the project; no cookies or tokens need to be pasted into chat.
+
+## Create or join a World
+
+Replace `CLI` with `plugins/chrona-game/skills/chrona-game/scripts/chrona.mjs` in a checkout of this repository, or the equivalent installed Skill path.
+
+```sh
+node CLI login --site https://your-chrona-site.example
+node CLI create --dir ./my-game --name "My game"
+node CLI push --dir ./my-game
+# Build the game with its original tools, then:
+node CLI preview --dir ./my-game --dist dist
+```
+
+A collaborator signs in separately:
+
+```sh
+node CLI login --site https://your-chrona-site.example --world WORLD_ID
+node CLI checkout --world WORLD_ID --dir ./world-project --name "Forest task"
+# Edit with Codex or Claude Code normally.
+node CLI push --dir ./world-project
+node CLI rebase --dir ./world-project
+node CLI preview --dir ./world-project --dist dist
+node CLI submit --dir ./world-project
+```
+
+`--world` also accepts the complete World link instead of a UUID; `--site` can then be omitted.
+
+Use **World Development → Collaboration** to inspect changes and previews, review, merge and release. Full commands, conflict resolution, roles, source limits, S3 assets and hosting boundaries are in the [collaboration guide](plugins/chrona-game/skills/chrona-game/references/collaboration.md).
 
 ## Preserving the game
 
-The Skill postpones the delivery contract until integration and keeps the original game available for comparison. It must not silently remove effects, replace artwork, change controls, or downgrade dependencies to satisfy the importer.
+The Skill keeps delivery instructions out of the initial design stage. Static delivery stores the existing browser build and the full source project; it does not require switching to a Chrona game template or downgrading dependencies. Compare the original and hosted game to verify behavior at the hosting boundary. A sandbox can still affect origin storage, login popups, networking, and service workers; those require explicit integration when used.
 
-The current importer **recompiles supported browser source**. It does not host arbitrary builds unchanged. Supported dependencies, sandbox restrictions, assets, saves, and multiplayer boundaries are documented in the [package contract](plugins/chrona-game/skills/chrona-game/references/package-contract.md). Incompatible features must be identified before changing the game.
+Two independent model generations cannot be guaranteed to produce identical games. The testable guarantee is preservation of a given project's source and build, followed by visual and gameplay checks. Hosting does not automatically add multiplayer or account saves.
 
-This workflow does not guarantee that two independent model generations produce identical games. Package validation also does not prove identical visuals or gameplay; compare the original and imported game to verify those properties.
-
-## Packaging an existing delivery project
-
-From a checkout of this repository, once the project satisfies the package contract:
-
-```bash
-node plugins/chrona-game/skills/chrona-game/scripts/game-kit.mjs check /path/to/delivery
-node plugins/chrona-game/skills/chrona-game/scripts/game-kit.mjs pack /path/to/delivery /path/to/game.chrona-game.json
-```
-
-In Chrona, choose **Create → New World → Start With → Import a Game Package**. To update an existing compatible World, use **World Development → Draft Workspace → Upload Game Package**.
-
-The included CLI supports `init`, `check`, `pack`, and an optional `preview` helper. It does not provide a direct upload API. Preview dependencies and package limits are listed in the contract.
+Older deployments can use the [v1 package importer](plugins/chrona-game/skills/chrona-game/references/package-contract.md) with `game-kit.mjs check` and `game-kit.mjs pack`. That path has its own supported runtime dependencies. The new collaboration CLI requires the corresponding server update; plugin installation does not upgrade the server.
 
 ## Repository layout
 
 ```text
-.agents/plugins/marketplace.json       Codex marketplace
-.claude-plugin/marketplace.json        Claude Code marketplace
+.agents/plugins/marketplace.json
+.claude-plugin/marketplace.json
 plugins/chrona-game/
-  .codex-plugin/plugin.json            Codex plugin
-  .claude-plugin/plugin.json           Claude Code plugin
+  .codex-plugin/plugin.json
+  .claude-plugin/plugin.json
   skills/chrona-game/
-    SKILL.md                          Delivery workflow
-    agents/openai.yaml                Skill display metadata
-    references/package-contract.md    Import and runtime contract
-    scripts/                          Packaging CLI and SDK
-    assets/starter/                   Optional starter project
-INSTALL.md                            Instructions for installation agents
+    SKILL.md
+    agents/openai.yaml
+    references/collaboration.md
+    references/package-contract.md
+    scripts/chrona.mjs
+    scripts/project-contract.mjs
+    scripts/project-files.mjs
+    scripts/game-kit.mjs
 ```
 
-Marketplace: `chrona-game` · Plugin: `chrona-game` · Skill: `chrona-game`
-
-For standalone Skill installation, copy `plugins/chrona-game/skills/chrona-game` into `~/.codex/skills/` or `~/.claude/skills/` instead of installing the plugin. Choose one installation method per client to avoid duplicate Skill entries.
+See [INSTALL.md](INSTALL.md) for installation and [CHANGELOG.md](CHANGELOG.md) for releases.
