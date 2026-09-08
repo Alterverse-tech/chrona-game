@@ -12,6 +12,18 @@ node CLI push --dir ./my-game --summary "Import complete game project"
 node CLI preview --dir ./my-game --dist dist
 ```
 
+### Complete an owned first import as a Draft World
+
+`previewUrl` is a branch-scoped collaboration preview. When the user wants an owned, editable World rather than only that branch preview, finish the first import after previewing it:
+
+```sh
+node CLI submit --dir ./my-game --title "Initial game import"
+node CLI review --dir ./my-game --submission SUBMISSION_ID
+node CLI merge --dir ./my-game --submission SUBMISSION_ID
+```
+
+Do not run `publish`. A successful merge advances `main` while `published` remains null/false, so the World remains Draft and can be launched from its editor. Return `https://your-chrona-site.example/studio/?world=WORLD_ID` as the handoff link; retain the branch `previewUrl` only as import evidence. Confirm with `status` that `main` is the imported commit and it has a build. For a shared World or a user who asks only for branch preview, the owner decides whether to review and merge.
+
 For the creation guide, use `login --site ORIGIN --remember` (add `--publish` when the user asks to publish). Login opens the browser automatically; the user checks the code and clicks **Connect** once. The CLI saves the connection privately outside the project. The browser waits for the CLI to receive it, then attempts to close; if the browser keeps the tab open, return to the coding client manually. No token copying or name/date fields are needed.
 
 A remembered connection stays active until revoked and can create multiple Worlds. It can access only Worlds created through that connection; existing Worlds still need their own member authorization. Later `login` calls reuse a valid saved connection and avoid reopening the browser. `--force` explicitly reconnects, for example to change accounts; `--no-browser` prints the link without opening it. `/studio/connect/` lists connections and revokes them. Credentials live in `~/.config/chrona/clients.json` with private file permissions; `CHRONA_CONFIG_DIR` selects another local configuration. Do not put credentials in a game project.
@@ -19,6 +31,8 @@ A remembered connection stays active until revoked and can create multiple World
 Without `--remember`, login keeps the existing World-scoped token flow and expiration settings. Existing tokens are not upgraded or given more permissions. Remembered connections require a server supporting the creation guide; do not claim a one-time connection on older servers.
 
 Source snapshots include code, package metadata, dependency lockfiles, build configuration, documentation and binary assets. They exclude credentials, `.env*`, `.git`, `.chrona`, dependencies, caches, `dist`, `build`, `artifacts`, and test reports. Unsupported paths and symlinks fail explicitly. Limits: 1,200 text files, 4 MiB per file, 32 MiB text total; 1,000 binary files, 512 MiB binary total. A 150 MB map fits the binary budget. Configured servers can store blobs in S3. Unchanged asset hashes do not upload again.
+
+A standalone `index.html` over 4 MiB exceeds the text-entry limit even when it is otherwise a working static game. Preserve the original and report that incompatibility instead of silently changing the game. Only after explicit user approval may a delivery-specific wrapper be introduced; keep the original outside the wrapper, verify that its recovered bytes match by SHA-256, and test the hosted game independently. Prefer a project’s existing source/build split or a supported platform import route whenever available.
 
 Builds need relative asset URLs. Vite can use `base: './'` or a delivery build with `--base=./`; preserve game logic. `preview --build` optionally runs the existing `npm run build`; `--script NAME` selects another existing npm script. Without this flag, supply output built from the pushed source. The server labels uploaded output as an author-supplied build; it does not pretend to have rebuilt it.
 

@@ -9,6 +9,16 @@ For creation plus upload, develop the game using the agent's normal workflow and
 
 For upload or continued collaboration, read [the project workflow](references/collaboration.md). Use the bundled `scripts/chrona.mjs` CLI to authorize, create or check out a World, push source changes, and upload a branch preview. Keep the complete project and lockfile; the server stores binary assets by content hash. Each member works on an independent branch. Review, merge, and release are distinct operations with server-enforced permissions and version checks.
 
+## Owned initial imports
+
+Treat a branch `previewUrl` as branch-scoped evidence, not as the final editable-World link. For an owned initial import where the user asks to upload a game as an editable World (rather than merely requesting a branch preview), preview the source version, then submit, review, and merge that initial version into `main`. Do not publish or launch the World unless the user requests it.
+
+After the merge, return the native editor link in the form `https://SITE/studio/?world=WORLD_ID`. Verify from `status` that `main` is the imported commit, a build exists for it, and `published` is null/false. Report that as a Draft World with Launch available; browser UI verification remains separate. For shared Worlds or a request limited to a branch preview, leave merging to the owner or to an explicit request.
+
+## Large self-contained HTML
+
+Check source snapshot limits before importing a standalone HTML game. A text entry over 4 MiB cannot be pushed as source. Preserve the original working game and report that concrete incompatibility; do not silently rewrite the game or add a loader merely to fit the importer. If the user explicitly authorizes a packaging adaptation, keep the original outside the delivery wrapper, verify the unpacked payload by SHA-256, and validate hosted behavior separately.
+
 Keep creation and delivery changes separate and retain a working original. Static delivery uses the game's own build output. Do not remove effects, replace assets, change controls, downgrade dependencies, or introduce mandatory gameplay SDK code to pass an importer. Check browser behavior at the hosting boundary; ordinary hosting does not automatically add account saves, multiplayer, or other game-specific features.
 
 If the target deployment only supports the older package importer, read [the v1 package contract](references/package-contract.md) before preparing that integration. Report a concrete incompatibility instead of silently changing the game. Do not present independent model generations as guaranteed identical.

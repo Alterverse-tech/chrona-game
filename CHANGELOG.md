@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2
+
+- Define the owned initial-import handoff: distinguish a branch preview from an editable Draft World, merge the reviewed first version into main when requested, and return the native editor link without launching or publishing.
+- Document the 4 MiB text-entry limit for self-contained HTML and require explicit authorization before a delivery-specific packaging wrapper is introduced.
+
 ## 0.2.0
 
 - Add complete project checkout, World-scoped browser authorization and incremental source/asset upload.
