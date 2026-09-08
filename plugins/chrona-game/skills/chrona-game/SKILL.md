@@ -17,7 +17,7 @@ After the merge, return the native editor link in the form `https://SITE/studio/
 
 ## Large self-contained HTML
 
-Check source snapshot limits before importing a standalone HTML game. A text entry over 4 MiB cannot be pushed as source. Preserve the original working game and report that concrete incompatibility; do not silently rewrite the game or add a loader merely to fit the importer. If the user explicitly authorizes a packaging adaptation, keep the original outside the delivery wrapper, verify the unpacked payload by SHA-256, and validate hosted behavior separately.
+Check source snapshot limits before importing a standalone HTML game. A text entry over 4 MiB cannot be pushed as source; that is a technical server limit, not the authorization threshold. For an unpacked single-file HTML no larger than 100 MB, a delivery-specific wrapper may be introduced when needed to cross that limit, provided it preserves the original outside the wrapper, verifies recovered bytes by SHA-256, does not change gameplay, and is disclosed in the delivery. For an unpacked single-file HTML over 100 MB, preserve the original and report the incompatibility; do not silently rewrite the game or add a loader without the user's explicit packaging authorization. Validate hosted behavior separately in either case.
 
 Keep creation and delivery changes separate and retain a working original. Static delivery uses the game's own build output. Do not remove effects, replace assets, change controls, downgrade dependencies, or introduce mandatory gameplay SDK code to pass an importer. Check browser behavior at the hosting boundary; ordinary hosting does not automatically add account saves, multiplayer, or other game-specific features.
 
