@@ -2,7 +2,7 @@
 
 Install the `chrona-game` plugin from the `chrona-game` marketplace. It exposes the **Chrona Game** Skill for delivering complete browser game projects and collaborating on owned, editable Chrona Worlds.
 
-Use the instructions for the current client. Install into that client only, unless the user asks for both. Collaboration requires version **0.2.0 or newer**. If that version is already installed and enabled, report it without duplicating the installation. Upgrade older versions using the commands below. Do not delete an existing standalone Skill without the user's instruction.
+Use the instructions for the current client. Install into that client only, unless the user asks for both. Collaboration requires version **0.3.0 or newer**. If that version is already installed and enabled, report it without duplicating the installation. Upgrade older versions using the commands below. Do not delete an existing standalone Skill without the user's instruction.
 
 ## Codex
 
@@ -56,18 +56,32 @@ Verify the installed version again and restart the Claude Code session.
 
 ## Runtime and authentication
 
-Packaging uses Node.js 20 or newer. Check `node --version` and report a missing or older runtime. This plugin has no MCP server or installation-time login. Packaging does not need the Chrona platform repository or an additional model API key.
+Packaging uses Node.js 20 or newer. Check `node --version` and report a missing or older runtime. This plugin has no MCP server. When the user asks to connect as part of setup, complete the connection below after installation. Packaging does not need the Chrona platform repository or an additional model API key.
 
-Collaboration requires a Chrona site with the collaboration API. Run the bundled chrona.mjs login command; the user approves its code using their normal browser sign-in. Never request cookies, passwords, or tokens in chat. The client stores a private, expiring, World-scoped grant outside the project. Older sites can still use the separate v1 package workflow. Installing this plugin does not upgrade a Chrona server.
+Collaboration requires a Chrona site with the collaboration API. Installing the plugin does not upgrade the server.
+
+## Connect once
+
+If the user's setup prompt supplies a Chrona site and asks to connect, run the installed Skill's `scripts/chrona.mjs` after verifying version 0.3.0 or newer:
+
+```sh
+node /ABSOLUTE/INSTALLED/SKILL/scripts/chrona.mjs login --site USER_CHRONA_ORIGIN --remember --publish --client "Codex"
+```
+
+Use the actual installed path and requested site; use `--client "Claude Code"` in Claude Code. Include `--publish` only when the setup request includes publishing access. Locate the installed Skill through the client's plugin listing or installation directory; do not ask the user to copy a token or find that path.
+
+The CLI automatically opens Chrona. Ask the user to check the displayed code and click **Connect** once. Keep the login process running until it confirms connection. The page attempts to close after the CLI saves the connection; if the browser prevents closing, the user can close the tab and return to the client. A missing browser prints the same authorization link as a fallback.
+
+The connection is reused for future tasks and games on that site, until revoked under Chrona's connections page. It only covers Worlds created by that connection; joining existing Worlds still uses their own member authorization. Credentials remain outside the project. Never request cookies, passwords, or tokens in chat. Setup without a requested site installs the plugin only.
 
 ## Start using the Skill
 
-After successful verification, report the installed plugin and version. Start a new Codex task or Claude Code session so the Skill is discovered. If the client cannot open a new task or session itself, tell the user to do so.
+After installation and any requested connection, report the result and invite the user to describe their game in the current conversation. If the client needs a session restart to discover the Skill, state that limitation; the saved connection remains usable. The agent can read the installed `SKILL.md` directly when continuing immediately.
 
-Suggested first prompt:
+Suggested prompt:
 
 ```text
-Make a third-person 3D planet game and upload it to Chrona.
+Make a third-person 3D planet game. When it is ready, upload it to Chrona and publish the World. Give me its playable link.
 ```
 
-Installation itself should not create a game, upload a package, publish a World, or change a game's source. The new task follows the user's game request and the Skill's delivery workflow.
+Installation itself should not create or publish a game. Once the user requests a game, use the agent's normal creative workflow and read delivery details when the playable project is ready. A request to publish authorizes submitting, approving, merging and releasing that game's update through the CLI; do not require the user to repeat that intent at every command. Public discovery is a separate setting.

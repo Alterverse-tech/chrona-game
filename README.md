@@ -9,16 +9,16 @@ Keep your normal game creation workflow. When the game is ready, Chrona Game hel
 Paste this into **Codex or Claude Code**:
 
 ```text
-Read https://raw.githubusercontent.com/Alterverse-tech/chrona-game/main/INSTALL.md to install the Chrona Game plugin for this client, then help me start a new task or session.
+Read https://raw.githubusercontent.com/Alterverse-tech/chrona-game/main/INSTALL.md to install or update the Chrona Game plugin for this client, then connect once for game creation and publishing at https://chrona-world.3-224-51-165.sslip.io using its bundled CLI login --remember --publish. Open the authorization page automatically and wait for my confirmation. Do not create a game yet.
 ```
 
-After installation, start a new task or session and ask:
+The browser opens automatically. Check the code, click **Connect** once, then return to your coding client and ask:
 
 ```text
-Make a third-person 3D planet game and upload it to Chrona.
+Make a third-person 3D planet game, upload it to Chrona and publish the World. Give me its playable link.
 ```
 
-The installation flow follows [Chrona 3D Assets](https://github.com/Alterverse-tech/chrona-3d-assets): add the marketplace, install the plugin, and start a new session.
+The installation flow follows [Chrona 3D Assets](https://github.com/Alterverse-tech/chrona-3d-assets): add the marketplace and install the plugin. The creation guide then connects your coding client with one confirmation. Future games reuse the connection until you revoke it.
 
 ## What it does
 
@@ -34,7 +34,7 @@ Uploading creates a development branch. Merging advances main; releasing changes
 4. C tells Codex: `Continue developing this World: WORLD_LINK. Add driving gameplay, preview it and submit the changes.`
 5. Each person approves their own first client connection. The agents use separate branches. A reviews, merges and releases the result.
 
-World links select the site and project automatically. Conflicts require explicit resolution and a new preview before approval. A member's branch does not change the live game until release. Both clients need plugin **0.2.0 or newer** and the target server needs the collaboration API.
+World links select the site and project automatically. Conflicts require explicit resolution and a new preview before approval. A member's branch does not change the live game until release. Both clients need plugin **0.3.0 or newer** and the target server needs the collaboration API.
 
 ## Manual installation
 
@@ -66,7 +66,7 @@ claude plugin marketplace list
 claude plugin list
 ```
 
-Start a new task or session after installation so the client discovers the Skill. See [INSTALL.md](INSTALL.md) for the complete installation instructions.
+Continue in your client after connecting. Restart the session only if your client requires it to discover a newly installed Skill. See [INSTALL.md](INSTALL.md) for the complete installation instructions.
 
 ## Requirements
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import {readFile,readdir,mkdir,rm} from 'node:fs/promises'
 import {resolve,join} from 'node:path'
-import {homedir} from 'node:os'
+import {homedir,hostname} from 'node:os'
 import {randomBytes,randomUUID} from 'node:crypto'
 import {spawn} from 'node:child_process'
 import {fileURLToPath} from 'node:url'
@@ -10,6 +10,15 @@ import {collectProject,collectBuild,atomicJson,readJson,isClean,materialize,safe
 
 const output=value=>console.log(JSON.stringify(value,null,2))
 const wait=ms=>new Promise(r=>setTimeout(r,ms))
+export function browserCommand(url,platform=process.platform){
+  return platform==='darwin'?['open',['-u',url]]:platform==='win32'?['rundll32.exe',['url.dll,FileProtocolHandler',url]]:['xdg-open',[url]]
+}
+export function openAuthorization(url,{platform=process.platform,spawnImpl=spawn}={}){
+  return new Promise(resolve=>{
+    const [command,args]=browserCommand(url,platform)
+    try{const child=spawnImpl(command,args,{stdio:'ignore',shell:false});child.once('error',()=>resolve(false));child.once('close',code=>resolve(code===0))}catch{resolve(false)}
+  })
+}
 export function options(args){const out={_:[]};for(let i=0;i<args.length;i++){if(args[i].startsWith('--')){const key=args[i].slice(2);out[key]=args[i+1]&&!args[i+1].startsWith('--')?args[++i]:true}else out._.push(args[i])}return out}
 function siteUrl(value){const u=new URL(value);if(u.username||u.password||u.pathname!=='/'||u.search||u.hash||!(u.protocol==='https:'||u.protocol==='http:'&&['localhost','127.0.0.1'].includes(u.hostname)))throw new Error('Use an HTTPS Chrona origin, or HTTP localhost');return u.origin}
 export function worldTarget(value,site){
@@ -37,15 +46,23 @@ async function runBuild(root,script){if(!/^[a-zA-Z0-9:_-]+$/.test(script))throw 
 export async function main(args=process.argv.slice(2)){
   const [command='help',...rest]=args,o=options(rest),root=resolve(o.dir||'.'),config=resolve(process.env.CHRONA_CONFIG_DIR||join(homedir(),'.config','chrona')),authPath=resolve(config,'clients.json'),statePath=resolve(root,'.chrona','workspace.json')
   Object.assign(o,worldTarget(o.world,o.site))
-  if(command==='help'){console.log('Chrona project CLI (Node.js 20+)\nlogin --site ORIGIN [--world ID_OR_LINK] [--publish] [--read-only]\ncreate --name NAME --dir PROJECT\ncheckout --world ID_OR_LINK --dir EMPTY_DIRECTORY [--read-only]\nconfigure --delivery metadata.json\nstatus | diff | push [--summary TEXT]\nbranch [--name TEXT] | pull | rebase [--resolve resolutions.json]\npreview [--build] [--script build] [--dist dist]\nsubmit [--title TEXT]\nreview --submission ID [--reject] | merge --submission ID | publish\nrestore --commit SHA\nUse --site ORIGIN to select a login. Credentials stay outside the project.');return}
+  if(command==='help'){console.log('Chrona project CLI (Node.js 20+)\nlogin --site ORIGIN [--world ID_OR_LINK] [--publish] [--read-only] [--remember] [--force]\ncreate --name NAME --dir PROJECT\ncheckout --world ID_OR_LINK --dir EMPTY_DIRECTORY [--read-only]\nconfigure --delivery metadata.json\nstatus | diff | push [--summary TEXT]\nbranch [--name TEXT] | pull | rebase [--resolve resolutions.json]\npreview [--build] [--script build] [--dist dist]\nsubmit [--title TEXT]\nreview --submission ID [--reject] | merge --submission ID | publish\nrestore --commit SHA\nUse --site ORIGIN to select a login. Credentials stay outside the project.');return}
   let credentials=await readJson(authPath,{clients:[]})
   if(command==='login'){
     const site=siteUrl(o.site||'http://localhost:8145'),verifier=randomBytes(32).toString('hex'),client=new ChronaClient(site),worldId=o.world||null
-    const auth=await client.request('/api/collaboration/auth/start',{worldId,challenge:digest(verifier),scopes:['read',...(o['read-only']?[]:['write']),...(o.publish?['publish']:[])],clientName:o.client||'Chrona CLI'})
-    console.log('Open '+site+auth.verificationPath+' and approve code '+auth.userCode+'.')
+    if(o.remember&&worldId)throw new Error('--remember is for creating new Worlds; use a World-scoped login to join a World')
+    const scopes=['read',...(o['read-only']?[]:['write']),...(o.publish?['publish']:[])]
+    const saved=credentials.clients.findLast(c=>c.site===site&&(c.worldId===worldId||worldId&&c.remember)&&(!o.remember||c.remember)&&scopes.every(s=>c.scopes?.includes(s))&&(c.remember&&c.expiresAt===null||c.expiresAt>Date.now()))
+    if(saved&&!o.force){try{const existing=new ChronaClient(site,saved.token);await existing.request('/api/collaboration/auth/session');if(worldId)await existing.request(`/api/worlds/${worldId}/collaboration`);console.log('Already connected. Continue in your creation tool.');output({authorized:true,site,worldId,reused:true});return}catch(error){if(![401,403].includes(error.status))throw error}}
+    const auth=await client.request('/api/collaboration/auth/start',{worldId,remember:!!o.remember,challenge:digest(verifier),scopes,clientName:o.client||'Chrona CLI',deviceName:hostname()})
+    const approvalUrl=new URL(auth.verificationPath,site)
+    if(approvalUrl.origin!==site||approvalUrl.username||approvalUrl.password||approvalUrl.hash||approvalUrl.pathname!=='/studio/connect/'||!/^[A-F0-9]{10}$/.test(auth.userCode)||approvalUrl.searchParams.get('code')!==auth.userCode)throw new Error('Chrona returned an invalid authorization link')
+    console.log('Open '+approvalUrl.href+' and approve code '+auth.userCode+'.')
+    console.log(o.remember?'Choose Connect in your browser. This CLI will receive it automatically; no copying is needed.':'Choose Create token in your browser. This CLI will receive it automatically; no copying is needed.')
+    if(!o['no-browser']){if(!await openAuthorization(approvalUrl.href))console.log('Could not open your browser automatically. Use the link above.')}
     const deadline=Date.now()+auth.expiresIn*1000
     while(Date.now()<deadline){await wait(auth.interval*1000);const result=await client.request('/api/collaboration/auth/poll',{deviceCode:auth.deviceCode,verifier});if(result.status!=='authorized')continue
-      credentials=await readJson(authPath,{clients:[]});credentials.clients=credentials.clients.filter(c=>!(c.site===site&&c.worldId===result.worldId));credentials.clients.push({site,...result});await atomicJson(authPath,credentials);output({authorized:true,site,worldId:result.worldId,expiresAt:result.expiresAt});return}
+      credentials=await readJson(authPath,{clients:[]});credentials.clients=credentials.clients.filter(c=>!(c.site===site&&c.worldId===result.worldId));credentials.clients.push({site,...result});await atomicJson(authPath,credentials);if(result.remember){try{await client.request('/api/collaboration/auth/received',{deviceCode:auth.deviceCode,verifier})}catch{console.log('Connection saved. You can close the browser tab manually.')}}console.log('Connected. Your token was saved securely; continue in your creation tool.');output({authorized:true,site,worldId:result.worldId,expiresAt:result.expiresAt});return}
     throw new Error('Authorization expired. Run login again')
   }
   await safeMetadata(root)
@@ -53,7 +70,8 @@ export async function main(args=process.argv.slice(2)){
   if(state&&o.world&&o.world!==state.worldId)throw new Error('This directory is bound to another World')
   if(state&&o.site&&siteUrl(o.site)!==state.site)throw new Error('This directory is bound to another Chrona site')
   const worldId=state?.worldId||o.world||null,site=siteUrl(o.site||state?.site||credentials.clients.at(-1)?.site||'http://localhost:8145')
-  const credential=credentials.clients.findLast(c=>c.site===site&&(c.worldId===worldId||command==='create'&&c.worldId===null)&&c.expiresAt>Date.now())
+  const valid=c=>c.site===site&&(c.remember&&c.expiresAt===null||c.expiresAt>Date.now())
+  const credential=credentials.clients.findLast(c=>valid(c)&&(c.worldId===worldId||command==='create'&&c.worldId===null))||credentials.clients.findLast(c=>valid(c)&&c.remember)
   if(!credential)throw new Error('Run login for '+(worldId||'a new World')+' at '+site+' first')
   const client=new ChronaClient(site,credential.token)
   const route=action=>`/api/worlds/${state.worldId}/collaboration${action?'/'+action:''}`
@@ -85,7 +103,7 @@ export async function main(args=process.argv.slice(2)){
     const pendingPath=resolve(root,'.chrona','create.json'),creation=await readJson(pendingPath,{requestId:randomUUID(),name:o.name||'My game World',site})
     if(creation.site!==site||creation.name!==(o.name||'My game World'))throw new Error('Retry the pending creation with its original name and site')
     await atomicJson(pendingPath,creation)
-    const created=await client.request('/api/collaboration/worlds',creation);state={site,worldId:created.worldId,project:emptyProject()};await save();credential.worldId=created.worldId;await atomicJson(authPath,credentials)
+    const created=await client.request('/api/collaboration/worlds',creation);state={site,worldId:created.worldId,project:emptyProject()};await save();if(!credential.remember)credential.worldId=created.worldId;await atomicJson(authPath,credentials)
     const status=await call('');state.policyRevision=status.policyRevision
     state.branch=await call('branch',{policyRevision:state.policyRevision,name:'Initial game',client:'Chrona CLI',requestId:creation.requestId});await save();await rm(pendingPath,{force:true})
     output({worldId:state.worldId,branch:state.branch.id,next:'push',url:site+'/studio/collaboration/?world='+state.worldId});return

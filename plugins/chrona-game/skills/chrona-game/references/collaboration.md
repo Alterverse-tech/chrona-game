@@ -5,14 +5,18 @@ Requirements: Node.js 20+, a Chrona deployment with the collaboration API, and a
 ## Deliver a completed game
 
 ```sh
-node CLI login --site https://your-chrona-site.example
+node CLI login --site https://your-chrona-site.example --remember
 node CLI create --site https://your-chrona-site.example --dir ./my-game --name "My game"
 node CLI push --dir ./my-game --summary "Import complete game project"
 # Build using this project's original tools and lockfile, then:
 node CLI preview --dir ./my-game --dist dist
 ```
 
-Login prints a browser approval URL and waits. The user verifies the code using their normal Chrona account. Credentials stay outside the project in `~/.config/chrona/clients.json`, with private file permissions and a 24-hour lifetime. `CHRONA_CONFIG_DIR` selects another local configuration. A creation grant becomes bound to the new World. Another World requires separate authorization. `/studio/connect/` lists and revokes clients.
+For the creation guide, use `login --site ORIGIN --remember` (add `--publish` when the user asks to publish). Login opens the browser automatically; the user checks the code and clicks **Connect** once. The CLI saves the connection privately outside the project. The browser waits for the CLI to receive it, then attempts to close; if the browser keeps the tab open, return to the coding client manually. No token copying or name/date fields are needed.
+
+A remembered connection stays active until revoked and can create multiple Worlds. It can access only Worlds created through that connection; existing Worlds still need their own member authorization. Later `login` calls reuse a valid saved connection and avoid reopening the browser. `--force` explicitly reconnects, for example to change accounts; `--no-browser` prints the link without opening it. `/studio/connect/` lists connections and revokes them. Credentials live in `~/.config/chrona/clients.json` with private file permissions; `CHRONA_CONFIG_DIR` selects another local configuration. Do not put credentials in a game project.
+
+Without `--remember`, login keeps the existing World-scoped token flow and expiration settings. Existing tokens are not upgraded or given more permissions. Remembered connections require a server supporting the creation guide; do not claim a one-time connection on older servers.
 
 Source snapshots include code, package metadata, dependency lockfiles, build configuration, documentation and binary assets. They exclude credentials, `.env*`, `.git`, `.chrona`, dependencies, caches, `dist`, `build`, `artifacts`, and test reports. Unsupported paths and symlinks fail explicitly. Limits: 1,200 text files, 4 MiB per file, 32 MiB text total; 1,000 binary files, 512 MiB binary total. A 150 MB map fits the binary budget. Configured servers can store blobs in S3. Unchanged asset hashes do not upload again.
 
@@ -51,7 +55,7 @@ Create a JSON resolution map outside the project: each conflicting path maps to 
 
 ## Review and release
 
-World Development → Collaboration exposes source, changes, independent previews, review, merge and release. Merging advances main; release changes the live World. The server rechecks source/build hashes, main, review version, membership and policy. An authorized reviewer can add `--publish` to `login --world WORLD_ID`, then use:
+World Development → Collaboration has an **Accept & publish** action and optional preview/change inspection. The CLI keeps review, merge and release as distinct commands; a request to publish authorizes completing that sequence for the requested update. Do not require separate user confirmations for each command when publication is already requested. Merging advances main; release changes the live World. The server rechecks source/build hashes, main, review version, membership and policy. A creator connection authorized with `--publish` can release its own Worlds without another login. An authorized reviewer can otherwise add `--publish` to `login --world WORLD_ID`, then use:
 
 ```sh
 node CLI review --dir ./world-project --submission SUBMISSION_ID
