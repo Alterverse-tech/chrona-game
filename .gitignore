@@ -1,0 +1,10 @@
+.DS_Store
+.env
+.env.*
+node_modules/
+dist/
+build/
+__pycache__/
+*.log
+*.chrona-game.json
+*.zip

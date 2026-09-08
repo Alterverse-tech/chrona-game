@@ -1,0 +1,18 @@
+{
+  "name": "chrona-game",
+  "version": "0.1.0",
+  "description": "Deliver browser games from Codex or Claude Code to Chrona as owned, editable Worlds.",
+  "author": {
+    "name": "Chrona"
+  },
+  "homepage": "https://github.com/Alterverse-tech/chrona-game",
+  "repository": "https://github.com/Alterverse-tech/chrona-game",
+  "keywords": [
+    "chrona",
+    "game",
+    "world-studio",
+    "browser-game",
+    "game-delivery"
+  ],
+  "skills": "./skills/"
+}

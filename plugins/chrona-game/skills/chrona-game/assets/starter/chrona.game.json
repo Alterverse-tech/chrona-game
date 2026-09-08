@@ -1,0 +1,1 @@
+{"format":"chrona.game/v1","id":"my-game","version":"1.0.0","title":"My Game","entry":"main.js","html":"index.html","styles":["style.css"],"scene":"scene.json","gameplay":"gameplay.js","coordinates":"cartesian","progress":"json","multiplayer":"none"}

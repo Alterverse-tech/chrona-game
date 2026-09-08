@@ -1,0 +1,36 @@
+{
+  "name": "chrona-game",
+  "version": "0.1.0",
+  "description": "Deliver browser games from Codex or Claude Code to Chrona as owned, editable Worlds.",
+  "author": {
+    "name": "Chrona"
+  },
+  "homepage": "https://github.com/Alterverse-tech/chrona-game",
+  "repository": "https://github.com/Alterverse-tech/chrona-game",
+  "keywords": [
+    "chrona",
+    "game",
+    "world-studio",
+    "browser-game",
+    "game-delivery"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Chrona Game",
+    "shortDescription": "Bring your browser game into Chrona.",
+    "longDescription": "Package a completed browser game, import it as an owned Chrona World, and continue editing through World Studio. Keep game creation in your normal coding workflow and apply the delivery contract during integration.",
+    "developerName": "Chrona",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Package browser games",
+      "Import owned Chrona Worlds",
+      "Continue editing in World Studio"
+    ],
+    "websiteURL": "https://github.com/Alterverse-tech/chrona-game",
+    "defaultPrompt": [
+      "Make a third-person 3D planet game and upload it to Chrona.",
+      "Upload my existing browser game to Chrona.",
+      "Update my existing Chrona World with this game."
+    ]
+  }
+}
