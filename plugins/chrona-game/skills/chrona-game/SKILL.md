@@ -1,6 +1,6 @@
 ---
 name: chrona-game
-description: Upload a browser game to Chrona as an owned, editable World, or continue building an existing World with other members in Codex or Claude Code. Handles project delivery and collaboration after ordinary game creation.
+description: Upload a browser game to Chrona as an owned, editable World, or continue building an existing World with other members in Codex, Claude Code, or WorkBuddy. Handles project delivery and collaboration after ordinary game creation.
 ---
 
 # Chrona game delivery and collaboration

@@ -6,10 +6,10 @@ Keep your normal game creation workflow. When the game is ready, Chrona Game hel
 
 ## Install with one prompt
 
-Paste this into **Codex or Claude Code**:
+Paste this into **Codex, Claude Code, or WorkBuddy**:
 
 ```text
-Read https://raw.githubusercontent.com/Alterverse-tech/chrona-game/main/INSTALL.md to install or update the Chrona Game plugin for this client, then connect once for game creation and publishing at https://chrona-world.3-224-51-165.sslip.io using its bundled CLI login --remember --publish. Open the authorization page automatically and wait for my confirmation. Do not create a game yet.
+Read https://raw.githubusercontent.com/Alterverse-tech/chrona-game/main/INSTALL.md to install the Chrona Game plugin for this client, then help me start a new task or session. Open the authorization page automatically and wait for my confirmation.
 ```
 
 The browser opens automatically. Check the code, click **Connect** once, then return to your coding client and ask:
@@ -34,7 +34,9 @@ Uploading creates a development branch. Merging advances main; releasing changes
 4. C tells Codex: `Continue developing this World: WORLD_LINK. Add driving gameplay, preview it and submit the changes.`
 5. Each person approves their own first client connection. The agents use separate branches. A reviews, merges and releases the result.
 
-World links select the site and project automatically. Conflicts require explicit resolution and a new preview before approval. A member's branch does not change the live game until release. Both clients need plugin **0.3.0 or newer** and the target server needs the collaboration API.
+World links select the site and project automatically. Conflicts require explicit resolution and a new preview before approval. A member's branch does not change the live game until release. Both clients need plugin **0.3.1 or newer** and the target server needs the collaboration API.
+
+Use the same installed plugin for creating and editing. For a shared World, the owner adds you as a developer; paste its link and your requested change into your coding client. See [INSTALL.md](INSTALL.md) for client-specific setup and authorization.
 
 ## Manual installation
 
