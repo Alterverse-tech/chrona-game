@@ -77,10 +77,10 @@ Collaboration requires a Chrona site with the collaboration API. Installing the 
 
 If the setup prompt says **"Open the authorization page automatically and wait for my confirmation"**, complete the connection before helping start the new task or session. No separate terminal command is required from the user.
 
-Use the site from the user's World link or explicit request. If neither is supplied, the default Chrona site is `https://chrona-world.3-224-51-165.sslip.io`. Run the installed Skill's `scripts/chrona.mjs` after verifying version 0.3.1 or newer:
+Use the site from the user's World link or explicit request. If neither is supplied, use the pre-dev Chrona site `https://chrona-world.3-239-35-193.sslip.io`. Its browser directory is `https://chrona-world.3-239-35-193.sslip.io/worlds.html`; CLI commands use the origin without `/worlds.html`. Do not fall back to `chrona.world` or another remembered site. Run the installed Skill's `scripts/chrona.mjs` after verifying version 0.3.4 or newer:
 
 ```sh
-node /ABSOLUTE/INSTALLED/SKILL/scripts/chrona.mjs login --site https://chrona-world.3-224-51-165.sslip.io --remember --publish --client "Codex"
+node /ABSOLUTE/INSTALLED/SKILL/scripts/chrona.mjs login --site https://chrona-world.3-239-35-193.sslip.io --remember --publish --client "Codex"
 ```
 
 Use the actual installed path and selected site. Set `--client` to the current tool: Codex, Claude Code, or WorkBuddy. The creation guide requests permission to create, edit, and publish Worlds created through this connection; the browser explains this access and the user confirms it. Do not publish any game during installation. Locate the installed Skill through the client's plugin listing or installation directory; do not ask the user to copy a token or find that path.

@@ -2,6 +2,8 @@
 
 Requirements: Node.js 20+, a Chrona deployment with the collaboration API, and a member role with development permissions. Codex and Claude Code run the same CLI. Replace `CLI` below with the absolute path to this Skill's `scripts/chrona.mjs`. Use the user's target site.
 
+For this plugin distribution, the default target site is `https://chrona-world.3-239-35-193.sslip.io`. Users can open `https://chrona-world.3-239-35-193.sslip.io/worlds.html` in the browser; CLI commands use the origin without `/worlds.html`. A full World link remains authoritative and selects its own origin and World ID.
+
 ## Deliver a completed game
 
 ```sh

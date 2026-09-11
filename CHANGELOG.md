@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.4
+
+- Default new-game delivery to the pre-dev Chrona site `chrona-world.3-239-35-193.sslip.io`.
+- Normalize the pre-dev `/worlds.html` directory URL to its site origin for CLI use.
+- Avoid reusing a remembered Chrona connection from another site when no target site is supplied.
+
 ## 0.3.3
 
 - Keep the 4 MiB text-entry limit as a technical constraint while raising the explicit-authorization threshold for a self-contained HTML delivery wrapper to 100 MB.

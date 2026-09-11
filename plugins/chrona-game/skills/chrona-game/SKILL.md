@@ -9,6 +9,12 @@ For creation plus upload, develop the game using the agent's normal workflow and
 
 For upload or continued collaboration, read [the project workflow](references/collaboration.md). Use the bundled `scripts/chrona.mjs` CLI to authorize, create or check out a World, push source changes, and upload a branch preview. Keep the complete project and lockfile; the server stores binary assets by content hash. Each member works on an independent branch. Review, merge, and release are distinct operations with server-enforced permissions and version checks.
 
+## Chrona site selection
+
+This plugin distribution uses `https://chrona-world.3-239-35-193.sslip.io` as its default Chrona site. The browser directory is `https://chrona-world.3-239-35-193.sslip.io/worlds.html`; CLI commands use the site origin without the `/worlds.html` path. The bundled CLI also normalizes a `/worlds.html` site URL to its origin.
+
+For a new game or a task without a concrete World link, pass the default site explicitly to `login` and keep it for `create`, `push`, `preview`, `submit`, `merge` and `publish`. Do not infer a different site from a remembered credential, and do not silently use `chrona.world`. When the user supplies a complete World link, its origin and World ID are authoritative; preserve that explicit target rather than replacing it with a default.
+
 ## Owned initial imports
 
 For games with existing login or multiplayer, read

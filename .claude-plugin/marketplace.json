@@ -9,7 +9,7 @@
       "name": "chrona-game",
       "source": "./plugins/chrona-game",
       "description": "Deliver browser games from Codex or Claude Code to Chrona as owned, editable Worlds.",
-      "version": "0.3.3",
+      "version": "0.3.4",
       "author": {
         "name": "Chrona"
       },
