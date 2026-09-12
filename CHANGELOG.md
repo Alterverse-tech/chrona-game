@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.5
+
+- Display the Skill as `Chrona: Chrona Game` in Codex while preserving its invocation identifier.
+
 ## 0.3.4
 
 - Default new-game delivery to the pre-dev Chrona site `chrona-world.3-239-35-193.sslip.io`.

@@ -1,4 +1,4 @@
 interface:
-  display_name: "Chrona Game"
+  display_name: "Chrona: Chrona Game"
   short_description: "Deliver a browser game as an editable Chrona World."
   default_prompt: "Use $chrona-game:chrona-game to upload my browser game to Chrona."

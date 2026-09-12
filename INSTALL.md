@@ -1,6 +1,6 @@
 # Install Chrona Game
 
-Install the `chrona-game` plugin from the `chrona-game` marketplace. It exposes the **Chrona Game** Skill for delivering complete browser game projects and collaborating on owned, editable Chrona Worlds.
+Install the `chrona-game` plugin from the `chrona-game` marketplace. It exposes the **Chrona: Chrona Game** Skill for delivering complete browser game projects and collaborating on owned, editable Chrona Worlds. The prefixed display name is included in version **0.3.5 or newer**.
 
 Use the instructions for the current client. Install into that client only, unless the user asks for both. Collaboration requires version **0.3.1 or newer**. If that version is already installed and enabled, report it without duplicating the installation. Upgrade older versions using the commands below. Do not delete an existing standalone Skill without the user's instruction.
 
